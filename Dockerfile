@@ -37,9 +37,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Run the official Unsloth Studio installer with CUDA 12.6 pre-configuration into /opt/unsloth/studio
 RUN mkdir -p /opt/unsloth/studio && \
-    curl -fsSL https://unsloth.ai/install.sh | sh && \
+    UNSLOTH_STUDIO_HOME=/opt/unsloth/studio curl -fsSL https://unsloth.ai/install.sh | sh && \
     mkdir -p /root/.unsloth && \
-    ln -sfn /opt/unsloth/studio /root/.unsloth/studio
+    ln -sfn /opt/unsloth/studio /root/.unsloth/studio && \
+    ln -sfn /opt/unsloth/studio/unsloth_studio/bin/unsloth /usr/local/bin/unsloth && \
+    ln -sfn /opt/unsloth/studio/unsloth_studio/bin/unsloth /usr/bin/unsloth && \
+    echo 'export UNSLOTH_STUDIO_HOME="/opt/unsloth/studio"' >> /etc/bash.bashrc && \
+    echo 'export STUDIO_HOME="/opt/unsloth/studio"' >> /etc/bash.bashrc && \
+    echo 'export PATH="/opt/unsloth/studio/bin:/opt/unsloth/studio/unsloth_studio/bin:/root/.local/bin:$PATH"' >> /etc/bash.bashrc && \
+    echo 'export HF_HOME="/workspace/.cache/huggingface"' >> /etc/bash.bashrc && \
+    echo 'export UNSLOTH_STUDIO_PASSWORD="scalland"' >> /etc/bash.bashrc
+
+# Copy runtime entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Set default workspace directory
 WORKDIR /workspace
@@ -48,7 +59,9 @@ WORKDIR /workspace
 EXPOSE 8888
 EXPOSE 8000
 
-# Start Unsloth Studio bound to 0.0.0.0 on container launch
+# Set entrypoint and default launch command
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["unsloth", "studio", "-H", "0.0.0.0", "-p", "8888"]
+
 
 
