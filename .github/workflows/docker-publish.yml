@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Read version from VERSION file
+        id: version
+        run: |
+          VERSION=$(tr -d '\r\n' < VERSION)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -31,9 +37,8 @@ jobs:
         with:
           images: scallandtech/unsloth-studio
           tags: |
-            type=raw,value=24.04
+            type=raw,value=${{ steps.version.outputs.version }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=semver,pattern={{version}}
             type=sha,format=short
 
       - name: Build and push Docker image
@@ -46,3 +51,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
