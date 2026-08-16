@@ -18,6 +18,10 @@ ENV HF_HOME="/workspace/.cache/huggingface"
 # Global paths for Unsloth Studio binaries and environment
 ENV PATH="/root/.local/bin:/root/.unsloth/studio/unsloth_studio/bin:$PATH"
 
+# Default Studio web UI authentication password
+ENV UNSLOTH_STUDIO_PASSWORD="scalland"
+
+
 # Install fundamental build tools, networking utilities, and Python 3
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \

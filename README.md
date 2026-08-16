@@ -2,7 +2,22 @@
 
 A lean, zero-bloat Docker template for deploying Unsloth Studio with full GPU acceleration on RunPod built in [Scalland Consultancy Services](https://scalland.com). You can also use this [docker image](https://hub.docker.com/r/scallandtech/unsloth-studio/tags) directly on your local machine.
 
+## Default Password
+
+The default password to access and authenticate with the Unsloth Studio Web UI is:
+
+```text
+scalland
+```
+
+### Changing / Overriding the Password:
+* **Via Web UI:** Go to **Settings** $\rightarrow$ **Security / Authentication** $\rightarrow$ **Change Password** once logged in.
+* **Via Terminal (CLI):** Run `unsloth studio reset-password` from the pod terminal to set a new password.
+* **At Deployment Time:** Set the `UNSLOTH_STUDIO_PASSWORD` environment variable (e.g., `UNSLOTH_STUDIO_PASSWORD="your-new-password"`) in your RunPod pod configuration.
+
 ## Description
+
+
 
 This template provides an optimized environment for running, fine-tuning, and serving large language models (LLMs) like Qwen, Llama, and DeepSeek using Unsloth Studio. Built on top of Ubuntu 24.04 LTS and NVIDIA CUDA 12.6 development toolkits, it pre-configures Unsloth Studio, accelerated CUDA backends, and Python dependencies. It routes all model caching, databases, and Hugging Face weights to persistent network volumes mounted at `/workspace`, preventing data loss across pod restarts while exposing native Web UI and OpenAI-compatible API endpoints.
 
