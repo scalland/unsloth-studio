@@ -12,15 +12,15 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 # Explicitly pin PyTorch CUDA 12.6 index family for headless Docker builds
 ENV UNSLOTH_TORCH_INDEX_FAMILY=cu126
 
-# Model cache directory mapped to persistent workspace volume
+# Permanent system directory for Unsloth Studio environment
+ENV UNSLOTH_STUDIO_HOME="/opt/unsloth/studio"
 ENV HF_HOME="/workspace/.cache/huggingface"
 
-# Global paths for Unsloth Studio binaries and environment
-ENV PATH="/root/.local/bin:/root/.unsloth/studio/unsloth_studio/bin:$PATH"
+# Global paths for Unsloth Studio binaries and virtual environment
+ENV PATH="/opt/unsloth/studio/bin:/opt/unsloth/studio/unsloth_studio/bin:/root/.local/bin:$PATH"
 
 # Default Studio web UI authentication password
 ENV UNSLOTH_STUDIO_PASSWORD="scalland"
-
 
 # Install fundamental build tools, networking utilities, and Python 3
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -28,13 +28,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     ca-certificates \
     build-essential \
+    cmake \
+    ninja-build \
     python3 \
     python3-pip \
     python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
-# Run the official Unsloth Studio installer with CUDA 12.6 pre-configuration
-RUN curl -fsSL https://unsloth.ai/install.sh | sh
+# Run the official Unsloth Studio installer with CUDA 12.6 pre-configuration into /opt/unsloth/studio
+RUN mkdir -p /opt/unsloth/studio && \
+    curl -fsSL https://unsloth.ai/install.sh | sh && \
+    mkdir -p /root/.unsloth && \
+    ln -sfn /opt/unsloth/studio /root/.unsloth/studio
 
 # Set default workspace directory
 WORKDIR /workspace
@@ -45,4 +50,5 @@ EXPOSE 8000
 
 # Start Unsloth Studio bound to 0.0.0.0 on container launch
 CMD ["unsloth", "studio", "-H", "0.0.0.0", "-p", "8888"]
+
 
