@@ -77,8 +77,11 @@ unsloth --version
 ## Version History
 
 * 24.04
-    * Base OS upgraded to Ubuntu 24.04 LTS with CUDA 12.6.3
-    * Dynamic Unsloth Studio installer integration
-    * Pre-configured persistent storage paths under `/workspace`
+    * Base OS: Ubuntu 24.04 LTS with NVIDIA CUDA 12.6.3 development toolkits.
+    * Pinned `UNSLOTH_TORCH_INDEX_FAMILY=cu126` to guarantee CUDA-enabled PyTorch and GPU inference backends during headless container builds.
+    * Configured NVIDIA container runtime flags (`NVIDIA_VISIBLE_DEVICES=all`, `NVIDIA_DRIVER_CAPABILITIES=compute,utility`).
+    * Isolated Unsloth Studio binaries in the immutable image layer (`/root/.unsloth/studio`) to prevent persistent volume shadowing when mounting `/workspace`.
+    * Pre-configured persistent Hugging Face cache under `/workspace/.cache/huggingface`.
 * ubuntu2404-unsloth2026.6.18
     * Initial Release
+
