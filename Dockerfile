@@ -16,6 +16,12 @@ ENV UNSLOTH_TORCH_INDEX_FAMILY=cu126
 ENV UNSLOTH_STUDIO_HOME="/opt/unsloth/studio"
 ENV HF_HOME="/workspace/.cache/huggingface"
 
+# llama.cpp prebuilt location (downloaded at container startup with GPU present)
+ENV UNSLOTH_LLAMA_CPP_PATH="/opt/unsloth/llama.cpp"
+
+# Force CUDA backend for llama.cpp prebuilt selection
+ENV UNSLOTH_LLAMA_CPP_BACKEND="cuda"
+
 # Global paths for Unsloth Studio binaries and virtual environment
 ENV PATH="/opt/unsloth/studio/bin:/opt/unsloth/studio/unsloth_studio/bin:/root/.local/bin:$PATH"
 
@@ -35,9 +41,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
-# Run the official Unsloth Studio installer with CUDA 12.6 pre-configuration into /opt/unsloth/studio
-RUN mkdir -p /opt/unsloth/studio && \
-    UNSLOTH_STUDIO_HOME=/opt/unsloth/studio curl -fsSL https://unsloth.ai/install.sh | sh && \
+# Run the official Unsloth Studio installer with CUDA 12.6 pre-configuration into /opt/unsloth/studio.
+# NOTE: llama.cpp prebuilt binaries (llama-server) are NOT installed here because the build
+# environment has no GPU. They are downloaded at container startup by entrypoint.sh via
+# 'unsloth studio setup' when the NVIDIA runtime provides GPU access.
+RUN mkdir -p /opt/unsloth/studio /opt/unsloth/llama.cpp && \
+    UNSLOTH_STUDIO_HOME=/opt/unsloth/studio curl -fsSL https://unsloth.ai/install.sh | sh || true && \
     mkdir -p /root/.unsloth && \
     ln -sfn /opt/unsloth/studio /root/.unsloth/studio && \
     ln -sfn /opt/unsloth/studio/unsloth_studio/bin/unsloth /usr/local/bin/unsloth && \
